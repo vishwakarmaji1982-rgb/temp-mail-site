@@ -3,159 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quick Temp Mail</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>GhostMail - Privacy & Rewards</title>
     <style>
-        body { background-color: #f4f6f9; padding-top: 50px; }
-        .email-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .status-log { font-size: 0.8rem; color: red; margin-top: 10px; }
+        /* CSS DESIGN - Professional & Clean */
+        :root {
+            --primary: #4A90E2;
+            --dark: #2C3E50;
+            --light: #ECF0F1;
+            --accent: #E74C3C;
+            --success: #27ae60;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: var(--dark);
+            color: white;
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; }
+        
+        /* Main Container */
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        /* MONEY ZONE - Banners */
+        .ad-banner {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            font-weight: bold;
+        }
+        .ad-banner:hover { background: #ffe8a1; }
+
+        /* Inputs & Buttons */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        input, select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            color: white;
+        }
+
+        .btn-custom { background: var(--primary); width: 100%; margin-top: 10px;}
+        .btn-random { background: var(--success); width: 100%; margin-top: 10px;}
+        .btn-copy { background: var(--dark); font-size: 0.8rem; padding: 5px 10px; margin-left: 10px;}
+        
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Inbox Section */
+        #inbox-section { display: none; margin-top: 20px; text-align: left; }
+        
+        .active-email-display {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px dashed var(--primary);
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--dark);
+            font-weight: bold;
+            word-break: break-all;
+        }
+
+        .email-list { margin-top: 20px; }
+        .email-item {
+            background: white;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        
+        .loader { color: #888; font-size: 0.9rem; text-align: center; margin-top: 10px;}
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #777;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
+<header>
+    <h1>👻 GhostMail</h1>
+</header>
+
+<div class="container" style="padding: 10px; background: transparent; box-shadow: none;">
+    <div style="background:#ddd; height: 50px; line-height:50px; border-radius:8px; color:#555; font-size:0.8rem;">
+        [PLACEHOLDER: TOP AD BANNER AREA]
+    </div>
+</div>
+
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="text-center mb-4">
-                <h1>🚀 Fast Temp Mail</h1>
-                <button class="btn btn-sm btn-outline-danger mt-2" onclick="hardReset()">⚠️ Click Here if Stuck</button>
-            </div>
+    <h2>Create Temporary Email</h2>
+    <p style="color:#666; font-size:0.9rem;">Secure, Anonymous, Free. Emails are deleted automatically.</p>
 
-            <div class="email-box mb-4">
-                <label class="form-label fw-bold">Your Email Address:</label>
-                <div class="input-group mb-3">
-                    <input type="text" id="current-email" class="form-control" readonly value="Connecting..." style="font-size: 1.2rem; font-weight: bold; color: #0d6efd;">
-                    <button class="btn btn-secondary" onclick="copyToClipboard()">Copy</button>
-                </div>
-                <div id="status-msg" class="status-log"></div>
-            </div>
+    <div id="create-form">
+        <div class="input-group">
+            <input type="text" id="username" placeholder="Custom name (e.g. king123)">
+            <select id="domain-select"><option>Loading...</option></select>
+        </div>
+        
+        <button class="btn-custom" onclick="attemptCustomCreate()">✨ Create Custom Email</button>
+        
+        <div style="margin: 10px 0; font-size:0.8rem; color:#888;">OR</div>
+        
+        <button class="btn-random" onclick="createRandomEmail()">🎲 Random Email</button>
+    </div>
 
-            <div class="email-box">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="m-0">Inbox</h4>
-                    <button class="btn btn-sm btn-success" onclick="fetchMessages()">Refresh</button>
-                </div>
-                <div id="message-list">
-                    <p class="text-center text-muted mt-3">Waiting for emails...</p>
-                </div>
-            </div>
+    <div id="inbox-section">
+        <div class="active-email-display">
+            <span id="current-email">...</span>
+            <button class="btn-copy" onclick="copyEmail()">Copy</button>
+        </div>
+
+        <a href="https://nordvpn.com" target="_blank" class="ad-banner">
+            🔒 YOUR IP IS VISIBLE! <br>
+            <span style="font-weight:normal; font-size:0.8rem;">Click here to hide your identity with a VPN before reading emails.</span>
+        </a>
+
+        <h3>📥 Inbox <span id="timer" style="font-size:0.8rem; font-weight:normal; float:right;">Auto-refreshing...</span></h3>
+        <div id="email-list" class="email-list">
+            <div style="text-align:center; padding:20px; color:#aaa;">Waiting for incoming emails...</div>
         </div>
     </div>
 </div>
 
+<footer>
+    &copy; 2025 GhostMail. Built for Privacy.
+</footer>
+
 <script>
-    // Switched to mail.gw (often faster/less blocked)
-    const API_URL = "https://api.mail.gw";
-    
+    const API_BASE = "https://api.mail.tm";
+    let token = "";
+    let emailAddress = "";
+    let refreshInterval;
+
+    // 1. Initialize: Load Domains
     async function init() {
-        log("Starting app...");
-        
-        // 1. Check if we already have an account
-        let token = localStorage.getItem("tm_token");
-        let account = localStorage.getItem("tm_account");
-
-        if (token && account) {
-            log("Restoring saved account...");
-            let accData = JSON.parse(account);
-            document.getElementById("current-email").value = accData.address;
-            fetchMessages();
-        } else {
-            log("Creating new account...");
-            await createRandomAccount();
-        }
-        
-        // Start auto-refresh
-        setInterval(fetchMessages, 5000);
-    }
-
-    async function createRandomAccount() {
         try {
-            // Get Domains
-            log("Fetching domains...");
-            let domainRes = await fetch(`${API_URL}/domains`);
-            if (!domainRes.ok) throw new Error("Could not connect to API");
-            let domainData = await domainRes.json();
-            let domain = domainData['hydra:member'][0].domain;
-
-            // Create Account
-            let user = "user" + Math.random().toString(36).substring(7);
-            let address = `${user}@${domain}`;
-            let password = "password";
-
-            log("Registering " + address);
-            await fetch(`${API_URL}/accounts`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ address: address, password: password })
-            });
-
-            // Get Token
-            let tokenRes = await fetch(`${API_URL}/token`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ address: address, password: password })
-            });
-            let tokenData = await tokenRes.json();
-
-            // Save
-            localStorage.setItem("tm_token", tokenData.token);
-            localStorage.setItem("tm_account", JSON.stringify({ address: address }));
+            const res = await fetch(`${API_BASE}/domains`);
+            const data = await res.json();
+            const select = document.getElementById('domain-select');
+            select.innerHTML = ""; // Clear loading text
             
-            document.getElementById("current-email").value = address;
-            log(""); // Clear errors
+            // Populate dropdown
+            if(data['hydra:member']) {
+                data['hydra:member'].forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.domain;
+                    opt.text = "@" + d.domain;
+                    select.appendChild(opt);
+                });
+            }
+        } catch (error) {
+            alert("Could not load domains. Please refresh or check internet.");
+        }
+    }
+    
+    // Run init on load
+    window.onload = init;
 
+    // 2. MONEY LOGIC: The "Fake" CPA Check
+    function attemptCustomCreate() {
+        const user = document.getElementById('username').value;
+        if(!user) return alert("Please enter a name first!");
+
+        // --- MONETIZATION TRICK ---
+        // Before creating, we show a "Loading/Verification" step.
+        // You can replace confirm() with a link to your CPA Locker.
+        
+        const wantToSupport = confirm("To create a CUSTOM address (Premium Feature), would you like to support us by viewing an ad?\n\n(Click OK to proceed)");
+        
+        if(wantToSupport) {
+            // window.open("YOUR_CPA_LINK_HERE", "_blank"); // Uncomment this when you have a link
+            createCustomEmail();
+        }
+        // --------------------------
+    }
+
+    // 3. Create Custom Email
+    async function createCustomEmail() {
+        const user = document.getElementById('username').value.toLowerCase();
+        const domain = document.getElementById('domain-select').value.replace("@", ""); // Remove @ for API
+        const fullEmail = `${user}@${domain}`;
+        const password = "password123";
+
+        register(fullEmail, password);
+    }
+
+    // 4. Create Random Email
+    function createRandomEmail() {
+        const randomStr = Math.random().toString(36).substring(7);
+        const domain = document.getElementById('domain-select').value.replace("@", "");
+        const fullEmail = `${randomStr}@${domain}`;
+        const password = "password123";
+        
+        register(fullEmail, password);
+    }
+
+    // 5. Core Register & Login Logic
+    async function register(email, password) {
+        // Step A: Register
+        try {
+            await fetch(`${API_BASE}/accounts`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ address: email, password: password })
+            });
         } catch (e) {
-            log("Error: " + e.message + ". Try clicking the Red Reset button.");
+            console.log("Account likely exists, trying login...");
+        }
+
+        // Step B: Login (Get Token)
+        try {
+            const res = await fetch(`${API_BASE}/token`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ address: email, password: password })
+            });
+            
+            if (!res.ok) throw new Error("Name unavailable");
+            
+            const data = await res.json();
+            token = data.token;
+            emailAddress = email;
+            
+            // Success: Switch UI
+            showInbox();
+        } catch (e) {
+            alert("That name is taken or invalid. Please try another.");
         }
     }
 
-    async function fetchMessages() {
-        let token = localStorage.getItem("tm_token");
-        if (!token) return;
+    // 6. UI Switching
+    function showInbox() {
+        document.getElementById('create-form').style.display = 'none';
+        document.getElementById('inbox-section').style.display = 'block';
+        document.getElementById('current-email').innerText = emailAddress;
+        
+        // Start polling for messages
+        fetchMessages();
+        refreshInterval = setInterval(fetchMessages, 5000); // Check every 5s
+    }
 
+    // 7. Fetch Messages
+    async function fetchMessages() {
+        if(!token) return;
+        
         try {
-            let res = await fetch(`${API_URL}/messages`, {
+            const res = await fetch(`${API_BASE}/messages`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
-            let data = await res.json();
-            renderInbox(data['hydra:member']);
+            const data = await res.json();
+            renderMessages(data['hydra:member']);
         } catch (e) {
-            console.log("Inbox refresh failed");
+            console.error("Error fetching messages");
         }
     }
 
-    function renderInbox(messages) {
-        let list = document.getElementById("message-list");
-        if (!messages || messages.length === 0) {
-            list.innerHTML = '<p class="text-center text-muted mt-3">Inbox is empty.</p>';
+    // 8. Render Messages
+    function renderMessages(messages) {
+        const list = document.getElementById('email-list');
+        list.innerHTML = ""; // Clear current list
+
+        if (messages.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding:20px; color:#aaa;">No emails yet. Auto-refreshing...</div>`;
             return;
         }
-        list.innerHTML = "";
+
         messages.forEach(msg => {
-            let div = document.createElement("div");
-            div.className = "p-2 border-bottom";
-            div.innerText = `From: ${msg.from.address} - ${msg.subject}`;
-            list.appendChild(div);
+            const item = document.createElement('div');
+            item.className = 'email-item';
+            item.innerHTML = `
+                <div style="color:#555; font-size:0.8rem;">From: ${msg.from.address}</div>
+                <div style="font-weight:bold; font-size:1rem; margin:5px 0;">${msg.subject}</div>
+                <div style="color:#666;">${msg.intro}...</div>
+            `;
+            list.appendChild(item);
         });
     }
 
-    function hardReset() {
-        localStorage.clear();
-        location.reload();
+    // Utility: Copy to Clipboard
+    function copyEmail() {
+        navigator.clipboard.writeText(emailAddress);
+        const btn = document.querySelector('.btn-copy');
+        btn.innerText = "Copied!";
+        setTimeout(() => btn.innerText = "Copy", 2000);
     }
-
-    function copyToClipboard() {
-        let copyText = document.getElementById("current-email");
-        copyText.select();
-        document.execCommand("copy");
-    }
-
-    function log(msg) {
-        document.getElementById("status-msg").innerText = msg;
-    }
-
-    // Start
-    init();
 </script>
 
 </body>
