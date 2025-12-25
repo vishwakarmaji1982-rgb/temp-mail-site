@@ -55,7 +55,7 @@
 </div>
 
 <script>
-    const API_URL = "https://api.mail.tm";
+    const API_URL = "https://api.mail.gw";
     let token = localStorage.getItem("tm_token");
     let account = JSON.parse(localStorage.getItem("tm_account"));
 
