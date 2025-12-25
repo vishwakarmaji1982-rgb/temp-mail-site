@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Temp Mail & Custom Email</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; padding-top: 50px; }
+        .email-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #message-list { max-height: 400px; overflow-y: auto; }
+        .message-item { border-bottom: 1px solid #eee; padding: 10px; cursor: pointer; }
+        .message-item:hover { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center mb-4">
+                <h1>🚀 Fast Temp Mail</h1>
+                <p class="text-muted">Free, Privacy-Focused, Customizable.</p>
+            </div>
+
+            <div class="email-box mb-4">
+                <label class="form-label fw-bold">Current Email Address:</label>
+                <div class="input-group mb-3">
+                    <input type="text" id="current-email" class="form-control" readonly value="Loading..." style="font-size: 1.2rem; font-weight: bold; color: #0d6efd;">
+                    <button class="btn btn-outline-secondary" onclick="copyToClipboard()">Copy</button>
+                </div>
+
+                <hr>
+
+                <h5>Create Custom Email</h5>
+                <div class="input-group">
+                    <input type="text" id="custom-user" class="form-control" placeholder="username (e.g., john)">
+                    <span class="input-group-text">@</span>
+                    <select id="domain-list" class="form-select" style="max-width: 150px;"></select>
+                    <button class="btn btn-primary" onclick="createCustomAccount()">Create</button>
+                </div>
+            </div>
+
+            <div class="email-box">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="m-0">Inbox</h4>
+                    <button class="btn btn-sm btn-success" onclick="fetchMessages()">Refresh ⟳</button>
+                </div>
+                <div id="message-list">
+                    <p class="text-center text-muted mt-3">Waiting for emails...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://api.mail.tm";
+    let token = localStorage.getItem("tm_token");
+    let account = JSON.parse(localStorage.getItem("tm_account"));
+
+    // 1. Initialize: Get Domains and setup account
+    async function init() {
+        await loadDomains();
+        if (token && account) {
+            displayAccount();
+            startInboxTimer();
+        } else {
+            createRandomAccount();
+        }
+    }
+
+    // 2. Load Available Domains from API
+    async function loadDomains() {
+        try {
+            let res = await fetch(`${API_URL}/domains`);
+            let data = await res.json();
+            let domainSelect = document.getElementById("domain-list");
+            data['hydra:member'].forEach(d => {
+                let option = document.createElement("option");
+                option.value = d.domain;
+                option.text = d.domain;
+                domainSelect.appendChild(option);
+            });
+            return data['hydra:member'][0].domain; // Return first domain
+        } catch (e) { alert("Error loading domains"); }
+    }
+
+    // 3. Create Account (Random or Custom)
+    async function createAccount(address, password) {
+        try {
+            // Register
+            let res = await fetch(`${API_URL}/accounts`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ address: address, password: password })
+            });
+
+            if (!res.ok) throw new Error("Username unavailable or taken.");
+
+            // Login to get Token
+            let loginRes = await fetch(`${API_URL}/token`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ address: address, password: password })
+            });
+            let loginData = await loginRes.json();
+
+            // Save Data
+            token = loginData.token;
+            account = { address: address };
+            localStorage.setItem("tm_token", token);
+            localStorage.setItem("tm_account", JSON.stringify(account));
+            
+            displayAccount();
+            startInboxTimer();
+            alert("Email created successfully!");
+
+        } catch (e) {
+            alert(e.message);
+        }
+    }
+
+    // Helper: Create Random Account
+    async function createRandomAccount() {
+        let domain = document.getElementById("domain-list").value || await loadDomains();
+        let user = Math.random().toString(36).substring(7);
+        createAccount(`${user}@${domain}`, "password123");
+    }
+
+    // Helper: Create Custom Account from Input
+    function createCustomAccount() {
+        let user = document.getElementById("custom-user").value;
+        let domain = document.getElementById("domain-list").value;
+        if(!user) return alert("Enter a username");
+        createAccount(`${user}@${domain}`, "password123");
+    }
+
+    function displayAccount() {
+        document.getElementById("current-email").value = account.address;
+        fetchMessages();
+    }
+
+    // 4. Fetch Messages
+    async function fetchMessages() {
+        if (!token) return;
+        let res = await fetch(`${API_URL}/messages`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        let data = await res.json();
+        renderInbox(data['hydra:member']);
+    }
+
+    function renderInbox(messages) {
+        let list = document.getElementById("message-list");
+        if (messages.length === 0) {
+            list.innerHTML = '<p class="text-center text-muted mt-3">Inbox is empty.</p>';
+            return;
+        }
+        list.innerHTML = "";
+        messages.forEach(msg => {
+            let div = document.createElement("div");
+            div.className = "message-item";
+            div.innerHTML = `<strong>${msg.from.name || msg.from.address}</strong>: ${msg.subject} <br> <small class="text-muted">${new Date(msg.createdAt).toLocaleTimeString()}</small>`;
+            div.onclick = () => alert("Subject: " + msg.subject + "\n\n" + msg.intro); // Simple view
+            list.appendChild(div);
+        });
+    }
+
+    function startInboxTimer() {
+        setInterval(fetchMessages, 5000); // Check every 5 seconds
+    }
+
+    function copyToClipboard() {
+        let copyText = document.getElementById("current-email");
+        copyText.select();
+        document.execCommand("copy");
+        alert("Copied!");
+    }
+
+    // Run on load
+    init();
+</script>
+
+</body>
+</html>
